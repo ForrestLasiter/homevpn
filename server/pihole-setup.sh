@@ -12,6 +12,13 @@
 # OR just edit the DNS line of existing clients to the hub address.
 
 set -euo pipefail
+
+# --- load shared config if present (for PIHOLE_PASSWORD, upstreams) ---
+for _cfg in "${CONFIG_FILE:-}" "$(dirname "${BASH_SOURCE[0]}")/config.env" \
+            "/opt/wg-hub/config.env" "/etc/wireguard/config.env"; do
+  [[ -n "${_cfg:-}" && -f "$_cfg" ]] && { set -a; . "$_cfg"; set +a; break; }
+done
+
 msg()  { echo -e "\033[1;32m[+]\033[0m $*"; }
 die()  { echo -e "\033[1;31m[x]\033[0m $*" >&2; exit 1; }
 [[ $EUID -eq 0 ]] || die "Run as root."

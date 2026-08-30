@@ -12,7 +12,9 @@ Built for: **Windows 11 PC, Android, iPhone/iPad, Linux machines.**
 > hostile Wi-Fi and for reaching home, but it does **not** hide who you are.
 > To exit behind a different IP, add the cloud node in
 > [`docs/PHASE2-vps-exit.md`](docs/PHASE2-vps-exit.md). For real anonymity,
-> that's Tor (Phase 3, same doc). This is **Phase 1**.
+> that's Tor ([`docs/PHASE3-tor.md`](docs/PHASE3-tor.md)). This is **Phase 1**.
+
+See [`ROADMAP.md`](ROADMAP.md) for the full multi-phase plan.
 
 ---
 
@@ -20,16 +22,27 @@ Built for: **Windows 11 PC, Android, iPhone/iPad, Linux machines.**
 
 ```
 homevpn/
+├── config.env.example        # copy to config.env — one file, all settings
 ├── proxmox/create-lxc.sh     # run on the Proxmox HOST — makes the container
-├── server/
-│   ├── bootstrap.sh          # run INSIDE it — stands up the WireGuard hub
-│   ├── add-client.sh         # run INSIDE it — enroll a device (+QR)
-│   ├── pihole-setup.sh       # run INSIDE it — network-wide ad blocking
-│   └── duckdns-update.sh     # keeps your home reachable as your IP changes
+├── server/                   # run INSIDE the container:
+│   ├── bootstrap.sh          #   stand up the WireGuard hub
+│   ├── add-client.sh         #   enroll a device (+QR)
+│   ├── list-clients.sh       #   who's enrolled + online now
+│   ├── show-client.sh        #   re-print a device's config / QR
+│   ├── remove-client.sh      #   revoke a device
+│   ├── status.sh             #   one-glance health check
+│   ├── backup.sh             #   back up / restore keys + config
+│   ├── uninstall.sh          #   tear it back down
+│   ├── pihole-setup.sh       #   network-wide ad blocking
+│   └── duckdns-update.sh     #   keep home reachable as your IP changes
+├── vps/                      # Phase 2 — run ON A CLOUD VPS:
+│   ├── bootstrap-exit.sh     #   turn a VPS into a not-your-house exit
+│   └── add-exit-client.sh    #   enroll a device on the exit
 ├── docs/
 │   ├── ROUTER.md             # the one port-forward you must do
-│   └── PHASE2-vps-exit.md    # the cloud exit node, for later
-└── clients/                  # where you keep the generated device configs
+│   ├── PHASE2-vps-exit.md    # the cloud exit node
+│   └── PHASE3-tor.md         # Tor, for real anonymity
+└── clients/                  # generated device configs land here (git-ignored)
 ```
 
 ---
@@ -41,24 +54,33 @@ homevpn/
   subdomain → copy the **token**. (Handles your changing home IP.)
 - Know your home LAN subnet (looks like `192.168.1.0/24`). On the Proxmox
   host: `ip route | grep -v wg | grep /`.
+- **Set your options once** — copy the template and edit it; every script
+  reads it, so you don't hand-edit each one:
+  ```bash
+  cd homevpn
+  cp config.env.example config.env
+  nano config.env      # HOME_LAN, DUCKDNS_DOMAIN, DUCKDNS_TOKEN, etc.
+  ```
+  (`config.env` is git-ignored — it holds your token, so it never gets
+  committed.)
 
 ### 1. Create the container (on the Proxmox host)
 Copy this folder to your Proxmox host, then:
 ```bash
 cd homevpn/proxmox
-# edit the settings at the top if you want a specific CTID / static IP
-./create-lxc.sh
+./create-lxc.sh          # reads ../config.env; also copies it into the container
 ```
 This makes a small Debian 12 LXC, gives it the TUN device WireGuard needs,
-and copies the `server/` scripts inside to `/opt/wg-hub`.
+and copies the `server/` scripts (and your `config.env`) inside to `/opt/wg-hub`.
 
 ### 2. Stand up the hub (inside the container)
 ```bash
 pct enter <CTID>          # CTID printed by the previous step (default 910)
 cd /opt/wg-hub
-nano bootstrap.sh         # set HOME_LAN, DUCKDNS_DOMAIN, DUCKDNS_TOKEN
-./bootstrap.sh
+./bootstrap.sh            # picks up the config.env that came with it
 ```
+> Didn't use `config.env`? Then edit the settings block at the top of
+> `bootstrap.sh` first (`HOME_LAN`, `DUCKDNS_DOMAIN`, `DUCKDNS_TOKEN`).
 When it finishes it prints the hub's public key and the endpoint your
 devices will use (`YOURNAME.duckdns.org:51820`).
 
@@ -113,13 +135,34 @@ sudo systemctl enable wg-quick@wg0   # start on boot
 
 ## Everyday use
 
+All of these run inside the hub container (`pct enter <CTID>`, `cd /opt/wg-hub`):
+
 | I want to… | Do this |
 |---|---|
-| Add another device | `./add-client.sh <name> [full\|split]` inside the container |
-| See who's connected | `wg show` inside the container |
-| Remove a device | delete its `[Peer]` block from `/etc/wireguard/wg0.conf`, then `wg syncconf wg0 <(wg-quick strip wg0)`, and delete `clients/<name>.conf` |
+| Add another device | `./add-client.sh <name> [full\|split]` |
+| List devices + who's online | `./list-clients.sh` |
+| Re-print a device's config/QR | `./show-client.sh <name>` |
+| Revoke a device | `./remove-client.sh <name>` |
+| Health check | `./status.sh` |
+| Back up keys + config | `./backup.sh /some/safe/dir` |
 | Restart the tunnel | `systemctl restart wg-quick@wg0` |
 | Rotate ad-block password | re-run `pihole-setup.sh` with a new `PIHOLE_PASSWORD` |
+| Tear it all down | `./uninstall.sh` (add `--purge` to wipe keys) |
+
+---
+
+## Phase 2 — exit behind a not-your-house IP
+
+When Phase 1 is proven and you want traffic to leave from somewhere other than
+your home IP, rent a cheap VPS and run, **on the VPS**:
+```bash
+./vps/bootstrap-exit.sh        # reads config.env (VPS_WG_* settings)
+./vps/add-exit-client.sh laptop
+```
+Keep both tunnels on your device and flip to the VPS one when you want the
+different exit. Read [`docs/PHASE2-vps-exit.md`](docs/PHASE2-vps-exit.md) first —
+this is **pseudonymity, not anonymity**. For real anonymity, see
+[`docs/PHASE3-tor.md`](docs/PHASE3-tor.md).
 
 ---
 

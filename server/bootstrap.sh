@@ -17,12 +17,18 @@
 
 set -euo pipefail
 
-# ==== SETTINGS — edit these ==========================================
-WG_IF="wg0"
-WG_PORT="51820"                       # UDP port to forward on your router
-WG_ADDR="10.10.10.1"                  # the hub's address inside the VPN
-WG_CIDR="24"                          # => VPN subnet 10.10.10.0/24
-WG_SUBNET="10.10.10.0/${WG_CIDR}"
+# --- load shared config if present (config.env overrides these defaults) ---
+for _cfg in "${CONFIG_FILE:-}" "$(dirname "${BASH_SOURCE[0]}")/config.env" \
+            "/opt/wg-hub/config.env" "/etc/wireguard/config.env"; do
+  [[ -n "${_cfg:-}" && -f "$_cfg" ]] && { set -a; . "$_cfg"; set +a; break; }
+done
+
+# ==== SETTINGS — edit these (or set them in config.env) ==============
+WG_IF="${WG_IF:-wg0}"
+WG_PORT="${WG_PORT:-51820}"           # UDP port to forward on your router
+WG_ADDR="${WG_ADDR:-10.10.10.1}"      # the hub's address inside the VPN
+WG_CIDR="${WG_CIDR:-24}"              # => VPN subnet 10.10.10.0/24
+WG_SUBNET="${WG_ADDR%.*}.0/${WG_CIDR}"
 
 # Your home LAN, so split-tunnel clients can reach home devices.
 # Find it with:  ip route | grep -v wg | grep /  (looks like 192.168.1.0/24)

@@ -13,9 +13,15 @@
 
 set -euo pipefail
 
-# ---- settings you may want to change --------------------------------
+# --- load shared config if present (config.env overrides these defaults) ---
+for _cfg in "${CONFIG_FILE:-}" "$(dirname "${BASH_SOURCE[0]}")/config.env" \
+            "$(dirname "${BASH_SOURCE[0]}")/../config.env"; do
+  [[ -n "${_cfg:-}" && -f "$_cfg" ]] && { set -a; . "$_cfg"; set +a; break; }
+done
+
+# ---- settings you may want to change (or set them in config.env) ----
 CTID="${CTID:-910}"                 # container ID (must be unused)
-HOSTNAME="${HOSTNAME:-wg-hub}"
+CT_HOSTNAME="${CT_HOSTNAME:-wg-hub}"
 STORAGE="${STORAGE:-local-lvm}"     # where the rootfs lives
 BRIDGE="${BRIDGE:-vmbr0}"           # your LAN bridge
 DISK_GB="${DISK_GB:-4}"
@@ -57,9 +63,9 @@ else
   NETCONF="name=eth0,bridge=${BRIDGE},ip=${NET_IP},gw=${NET_GW}"
 fi
 
-msg "Creating CT $CTID ($HOSTNAME)..."
+msg "Creating CT $CTID ($CT_HOSTNAME)..."
 pct create "$CTID" "$TMPL_PATH" \
-  --hostname "$HOSTNAME" \
+  --hostname "$CT_HOSTNAME" \
   --cores "$CORES" \
   --memory "$RAM_MB" \
   --swap 256 \
@@ -96,6 +102,14 @@ for f in "$SRC_DIR"/*.sh; do
   pct push "$CTID" "$f" "/opt/wg-hub/$(basename "$f")"
   pct exec "$CTID" -- chmod +x "/opt/wg-hub/$(basename "$f")"
 done
+
+# carry the shared config.env inside too, so the hub scripts read the same
+# settings you set out here (if you made one from config.env.example).
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -f "$REPO_DIR/config.env" ]]; then
+  msg "Copying config.env into the container ..."
+  pct push "$CTID" "$REPO_DIR/config.env" "/opt/wg-hub/config.env"
+fi
 
 echo
 msg "Container $CTID is up."
