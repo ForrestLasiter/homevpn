@@ -59,12 +59,16 @@ apt-get update -qq
 apt-get install -y -qq wireguard wireguard-tools iptables qrencode curl >/dev/null
 
 # --- 2. IP forwarding ------------------------------------------------
+# The drop-in makes it persist across reboots; we apply the two keys
+# directly (not `sysctl --system`, which in an unprivileged LXC tries to
+# set host-only keys like kernel.pid_max and fails).
 msg "Enabling IP forwarding..."
 cat > /etc/sysctl.d/99-wireguard-forward.conf <<EOF
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 EOF
-sysctl -q --system
+sysctl -q -w net.ipv4.ip_forward=1 2>/dev/null || true
+sysctl -q -w net.ipv6.conf.all.forwarding=1 2>/dev/null || true
 
 # --- 3. hub keypair --------------------------------------------------
 KEYDIR="/etc/wireguard/keys"

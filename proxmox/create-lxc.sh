@@ -72,6 +72,7 @@ pct create "$CTID" "$TMPL_PATH" \
   --swap 256 \
   --rootfs "${STORAGE}:${DISK_GB}" \
   --net0 "$NETCONF" \
+  --nameserver "${CT_NAMESERVER:-1.1.1.1}" \
   --features "nesting=1" \
   --unprivileged "$UNPRIVILEGED" \
   --onboot 1 \

@@ -42,7 +42,10 @@ cat > /etc/sysctl.d/99-wg-exit.conf <<EOF
 net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 EOF
-sysctl -q --system
+# Apply the two keys directly; `sysctl --system` fails in an unprivileged
+# LXC (tries to set host-only keys). The drop-in handles reboot persistence.
+sysctl -q -w net.ipv4.ip_forward=1 2>/dev/null || true
+sysctl -q -w net.ipv6.conf.all.forwarding=1 2>/dev/null || true
 
 KEYDIR="/etc/wireguard/keys"; install -d -m 700 "$KEYDIR"
 if [[ ! -f "$KEYDIR/exit.key" ]]; then
