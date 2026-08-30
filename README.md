@@ -16,6 +16,11 @@ Built for: **Windows 11 PC, Android, iPhone/iPad, Linux machines.**
 
 See [`ROADMAP.md`](ROADMAP.md) for the full multi-phase plan.
 
+> 📋 **New here? Read [`docs/PREREQUISITES.md`](docs/PREREQUISITES.md) first** —
+> it lists every third-party site and piece of software you'll touch (Proxmox,
+> the WireGuard apps, DuckDNS, Pi-hole, an optional VPS, Tor), what each costs,
+> and exactly how to get it. Phase 1 is entirely free.
+
 ---
 
 ## What's in here
@@ -39,6 +44,7 @@ homevpn/
 │   ├── bootstrap-exit.sh     #   turn a VPS into a not-your-house exit
 │   └── add-exit-client.sh    #   enroll a device on the exit
 ├── docs/
+│   ├── PREREQUISITES.md      # every third-party site/app + how to get it
 │   ├── ROUTER.md             # the one port-forward you must do
 │   ├── PHASE2-vps-exit.md    # the cloud exit node
 │   └── PHASE3-tor.md         # Tor, for real anonymity
