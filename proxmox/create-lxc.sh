@@ -16,6 +16,7 @@ set -euo pipefail
 # --- load shared config if present (config.env overrides these defaults) ---
 for _cfg in "${CONFIG_FILE:-}" "$(dirname "${BASH_SOURCE[0]}")/config.env" \
             "$(dirname "${BASH_SOURCE[0]}")/../config.env"; do
+  # shellcheck source=/dev/null
   [[ -n "${_cfg:-}" && -f "$_cfg" ]] && { set -a; . "$_cfg"; set +a; break; }
 done
 
