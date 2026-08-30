@@ -1,0 +1,8 @@
+# Shell scripts must stay LF even when cloned on Windows — CRLF breaks the
+# shebang and bash on the Linux hosts these run on.
+*.sh    text eol=lf
+*.conf  text eol=lf
+*.env   text eol=lf
+
+# Docs: normalize to LF for consistency.
+*.md    text eol=lf

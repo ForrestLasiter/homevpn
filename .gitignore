@@ -1,0 +1,26 @@
+# --- secrets: never commit real keys or device configs -------------------
+# WireGuard private/public keys
+*.key
+*.pub
+
+# Generated per-device client configs (contain private keys)
+clients/*
+!clients/.gitkeep
+
+# Live server configs generated on the hub
+wg0.conf
+hub.env
+duckdns.env
+
+# Any real env / config files — keep only the *.example / *.template versions
+*.env
+!*.env.example
+*.conf
+!*.conf.example
+!*.conf.template
+
+# --- os / editor cruft ---------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
