@@ -15,30 +15,32 @@ network from anywhere, a device mesh, and (optionally) network-wide ad blocking.
 - ✅ `server/pihole-setup.sh` — network-wide ad/tracker blocking
 - ✅ `docs/ROUTER.md` — the one port-forward + CGNAT check
 
-## Phase 1.5 — Public-ready polish 🚧
+## Phase 1.5 — Public-ready polish ✅
 Make it something *anyone* can clone and run, and something *we* can operate.
 
-- ⬜ `config.env` — one file for all settings; every script reads it
-- ⬜ `server/list-clients.sh` — who's enrolled + live handshake status
-- ⬜ `server/show-client.sh` — re-print a device's config / QR
-- ⬜ `server/remove-client.sh` — revoke a device cleanly
-- ⬜ `server/status.sh` — one-glance health (tunnel, peers, DNS, DuckDNS, IP fwd)
-- ⬜ `server/backup.sh` — back up / restore the hub's keys + config
-- ⬜ `server/uninstall.sh` — tear it all back down
-- ⬜ `LICENSE` (MIT), `CONTRIBUTING.md`, shellcheck CI, README polish
+- ✅ `config.env` — one file for all settings; every script reads it
+- ✅ `server/list-clients.sh` — who's enrolled + live handshake status
+- ✅ `server/show-client.sh` — re-print a device's config / QR
+- ✅ `server/remove-client.sh` — revoke a device cleanly
+- ✅ `server/status.sh` — one-glance health (tunnel, peers, DNS, DuckDNS, IP fwd)
+- ✅ `server/backup.sh` — back up / restore the hub's keys + config
+- ✅ `server/uninstall.sh` — tear it all back down
+- ✅ `LICENSE` (MIT), `CONTRIBUTING.md`, shellcheck CI (green), README polish
 
 ## Phase 2 — Cloud VPS exit node 🧊
 Exit behind an IP that isn't your house. **Pseudonymity, not anonymity** — see
 `docs/PHASE2-vps-exit.md` for the honest limits.
 
-- ⬜ `vps/bootstrap-exit.sh` — turn a fresh VPS into a WireGuard exit
-- ⬜ `vps/add-exit-to-client.sh` — point a device's full-tunnel at the VPS
+- ✅ `vps/bootstrap-exit.sh` — turn a fresh VPS into a WireGuard exit
+- ✅ `vps/add-exit-client.sh` — full-tunnel device config that exits via the VPS
 - 🧊 verify end-to-end (needs a rented VPS)
+- ⬜ optional: home hub *chains* through the VPS (policy routing) so clients keep
+      one config and the exit is chosen centrally
 
 ## Phase 3 — Tor 🧊
 Real anonymity for the sessions that need it — kept separate on purpose.
 
-- ⬜ `docs/PHASE3-tor.md` — Tor Browser vs. a transparent-proxy peer, trade-offs
+- ✅ `docs/PHASE3-tor.md` — Tor Browser vs. a transparent-proxy peer, trade-offs
 - 🧊 optional `tor` peer on the hub (needs testing)
 
 ## Cross-cutting / later
