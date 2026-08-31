@@ -45,6 +45,7 @@ homevpn/
 │   └── add-exit-client.sh    #   enroll a device on the exit
 ├── docs/
 │   ├── PREREQUISITES.md      # every third-party site/app + how to get it
+│   ├── CONNECT-DEVICES.md    # per-platform: connect Windows/Android/iOS/Linux
 │   ├── ROUTER.md             # the one port-forward you must do
 │   ├── PHASE2-vps-exit.md    # the cloud exit node
 │   └── PHASE3-tor.md         # Tor, for real anonymity
@@ -117,25 +118,13 @@ Now every VPN device gets ad/tracker blocking via DNS, admin UI at
 
 ## Installing each device
 
-**Windows 11 PC**
-1. Install the WireGuard app (https://www.wireguard.com/install/).
-2. Get the config text: on the Proxmox host,
-   `pct pull <CTID> /etc/wireguard/clients/windows-pc.conf windows-pc.conf`
-   — or just `cat` it inside the container and copy the text.
-3. WireGuard → *Add Tunnel* → *Add empty tunnel* → paste → Save → Activate.
+Full step-by-step for **Windows, Android, iPhone/iPad, and Linux** — including
+how to import a config, turn the tunnel on/off, and confirm it's working — is in
+**[`docs/CONNECT-DEVICES.md`](docs/CONNECT-DEVICES.md)**.
 
-**Android / iPhone / iPad**
-1. Install "WireGuard" from the Play Store / App Store.
-2. In the app: **+** → *Create from QR code* → scan the QR that
-   `add-client.sh` printed. Name it, toggle on. Done.
-
-**Linux (WellSpring / others)**
-```bash
-sudo apt install wireguard        # or your distro's package
-sudo cp wellspring-lt.conf /etc/wireguard/wg0.conf
-sudo wg-quick up wg0              # start now
-sudo systemctl enable wg-quick@wg0   # start on boot
-```
+The short version: install the WireGuard app for the platform, then load the
+device's config — **import the `.conf` file** (Windows/Linux) or **scan the QR**
+(phones/tablets) — and toggle it on.
 
 ---
 
