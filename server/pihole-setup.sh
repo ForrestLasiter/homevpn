@@ -20,7 +20,12 @@ for _cfg in "${CONFIG_FILE:-}" "$(dirname "${BASH_SOURCE[0]}")/config.env" \
   [[ -n "${_cfg:-}" && -f "$_cfg" ]] && { set -a; . "$_cfg"; set +a; break; }
 done
 
+# Pi-hole installs to /usr/local/bin; ensure it's on PATH even under a bare
+# non-login shell (e.g. `pct exec`), or the password/config steps below fail.
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+
 msg()  { echo -e "\033[1;32m[+]\033[0m $*"; }
+warn() { echo -e "\033[1;33m[!]\033[0m $*"; }
 die()  { echo -e "\033[1;31m[x]\033[0m $*" >&2; exit 1; }
 [[ $EUID -eq 0 ]] || die "Run as root."
 [[ -f /etc/wireguard/hub.env ]] || die "Run bootstrap.sh first."
@@ -54,7 +59,10 @@ msg "Installing Pi-hole (unattended)..."
 curl -fsSL https://install.pi-hole.net | bash /dev/stdin --unattended
 
 msg "Setting the web-UI password..."
-pihole -a -p "$PIHOLE_PASSWORD" || pihole setpassword "$PIHOLE_PASSWORD" || true
+# Pi-hole v6 uses `pihole setpassword`; v5 used `pihole -a -p`.
+pihole setpassword "$PIHOLE_PASSWORD" 2>/dev/null \
+  || pihole -a -p "$PIHOLE_PASSWORD" 2>/dev/null \
+  || warn "Could not set the web-UI password automatically — set it with: pihole setpassword"
 
 # Only answer DNS on the VPN interface — never expose the resolver to the
 # internet (open resolvers get abused).
