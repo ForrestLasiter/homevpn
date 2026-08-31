@@ -25,6 +25,7 @@ Make it something *anyone* can clone and run, and something *we* can operate.
 - ✅ `server/status.sh` — one-glance health (tunnel, peers, DNS, DuckDNS, IP fwd)
 - ✅ `server/backup.sh` — back up / restore the hub's keys + config
 - ✅ `server/uninstall.sh` — tear it all back down
+- ✅ `server/harden.sh` — auto security updates + curated blocklists (OISD/Hagezi) + DNSSEC
 - ✅ `LICENSE` (MIT), `CONTRIBUTING.md`, shellcheck CI (green), README polish
 
 ## Phase 2 — Cloud VPS exit node 🧊
