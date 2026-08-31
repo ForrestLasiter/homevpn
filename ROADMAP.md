@@ -26,6 +26,8 @@ Make it something *anyone* can clone and run, and something *we* can operate.
 - ✅ `server/backup.sh` — back up / restore the hub's keys + config
 - ✅ `server/uninstall.sh` — tear it all back down
 - ✅ `server/harden.sh` — auto security updates + curated blocklists (OISD/Hagezi) + DNSSEC
+- ✅ `server/encrypt-dns.sh` — encrypted upstream DNS (DoT via unbound), so the ISP can't see lookups
+- ✅ Pi-hole listens in LOCAL (bind-dynamic) mode — survives wg0 coming up late after a reboot
 - ✅ `LICENSE` (MIT), `CONTRIBUTING.md`, shellcheck CI (green), README polish
 
 ## Phase 2 — Cloud VPS exit node 🧊

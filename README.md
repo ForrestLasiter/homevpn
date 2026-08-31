@@ -39,6 +39,7 @@ homevpn/
 │   ├── backup.sh             #   back up / restore keys + config
 │   ├── uninstall.sh          #   tear it back down
 │   ├── pihole-setup.sh       #   network-wide ad blocking
+│   ├── encrypt-dns.sh        #   encrypt upstream DNS (DoT via unbound) so the ISP can't see it
 │   ├── harden.sh             #   auto security updates + stronger blocklists + DNSSEC
 │   └── duckdns-update.sh     #   keep home reachable as your IP changes
 ├── vps/                      # Phase 2 — run ON A CLOUD VPS:
@@ -143,6 +144,7 @@ All of these run inside the hub container (`pct enter <CTID>`, `cd /opt/wg-hub`)
 | Back up keys + config | `./backup.sh /some/safe/dir` |
 | Restart the tunnel | `systemctl restart wg-quick@wg0` |
 | Rotate ad-block password | re-run `pihole-setup.sh` with a new `PIHOLE_PASSWORD` |
+| Encrypt upstream DNS (DoT, hides lookups from your ISP) | `./encrypt-dns.sh` |
 | Harden (auto-updates + stronger blocklists + DNSSEC) | `./harden.sh` |
 | Tear it all down | `./uninstall.sh` (add `--purge` to wipe keys) |
 

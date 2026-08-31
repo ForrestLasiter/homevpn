@@ -51,7 +51,7 @@ LIGHTTPD_ENABLED=true
 CACHE_SIZE=10000
 DNS_FQDN_REQUIRED=true
 DNS_BOGUS_PRIV=true
-DNSMASQ_LISTENING=single
+DNSMASQ_LISTENING=local
 BLOCKING_ENABLED=true
 EOF
 
@@ -64,10 +64,11 @@ pihole setpassword "$PIHOLE_PASSWORD" 2>/dev/null \
   || pihole -a -p "$PIHOLE_PASSWORD" 2>/dev/null \
   || warn "Could not set the web-UI password automatically — set it with: pihole setpassword"
 
-# Only answer DNS on the VPN interface — never expose the resolver to the
-# internet (open resolvers get abused).
-if command -v pihole >/dev/null; then
-  pihole -a -i single >/dev/null 2>&1 || true
+# Listen in "local" mode: bind-dynamic (survives the wg0 interface coming up
+# late after a reboot) and answer only local networks — never the internet.
+# ("single" binds strictly to one iface and breaks when wg0 restarts.)
+if command -v pihole-FTL >/dev/null; then
+  pihole-FTL --config dns.listeningMode LOCAL >/dev/null 2>&1 || true
 fi
 
 # Point the hub's client DNS at itself for future add-client runs.
