@@ -42,7 +42,7 @@ CLIENT_DNS="${CLIENT_DNS:-1.1.1.1}"
 
 # DuckDNS — so your changing home IP always resolves to a stable name.
 # Make a domain at https://www.duckdns.org and paste them here.
-DUCKDNS_DOMAIN="${DUCKDNS_DOMAIN:-}"  # e.g. forresthome  (no .duckdns.org)
+DUCKDNS_DOMAIN="${DUCKDNS_DOMAIN:-}"  # e.g. myhomelab  (no .duckdns.org)
 DUCKDNS_TOKEN="${DUCKDNS_TOKEN:-}"    # the token shown on duckdns.org
 # =====================================================================
 
