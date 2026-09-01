@@ -40,11 +40,13 @@ Exit behind an IP that isn't your house. **Pseudonymity, not anonymity** — see
 - ⬜ optional: home hub *chains* through the VPS (policy routing) so clients keep
       one config and the exit is chosen centrally
 
-## Phase 3 — Tor 🧊
+## Phase 3 — Tor ✅
 Real anonymity for the sessions that need it — kept separate on purpose.
 
-- ✅ `docs/PHASE3-tor.md` — Tor Browser vs. a transparent-proxy peer, trade-offs
-- 🧊 optional `tor` peer on the hub (needs testing)
+- ✅ `docs/PHASE3-tor.md` — Tor Browser vs. Whonix vs. Tails, trade-offs + behavior rules
+- ✅ `docs/PHASE3-whonix-proxmox.md` — full Whonix Gateway+Workstation build on
+      Proxmox (verified: Tor + obfs4 bridges + Safest), incl. the 10.0.2.2 NAT
+      gotcha and virtio-gpu display fix
 
 ## Cross-cutting / later
 - ⬜ Generic Debian/Ubuntu host path (not just Proxmox) — bootstrap already works

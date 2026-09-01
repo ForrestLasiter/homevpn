@@ -50,7 +50,8 @@ homevpn/
 │   ├── CONNECT-DEVICES.md    # per-platform: connect Windows/Android/iOS/Linux
 │   ├── ROUTER.md             # the one port-forward you must do
 │   ├── PHASE2-vps-exit.md    # the cloud exit node
-│   └── PHASE3-tor.md         # Tor, for real anonymity
+│   ├── PHASE3-tor.md         # Tor, for real anonymity
+│   └── PHASE3-whonix-proxmox.md  # built: Whonix Gateway+Workstation on Proxmox
 └── clients/                  # generated device configs land here (git-ignored)
 ```
 
