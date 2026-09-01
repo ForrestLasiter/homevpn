@@ -60,7 +60,7 @@ Then `ifreload -a`. (Replace `vmbr0` with your Proxmox uplink bridge if differen
 ```bash
 LVM=local-lvm
 # Gateway: net0 = external NAT (vmbr10), net1 = internal (vmbr9)
-qm create 105 --name Whonix-Gateway --memory 2048 --cores 1 --cpu host \
+qm create 105 --name Whonix-Gateway --memory 2048 --cores 1 --cpu host,hidden=1 \
   --machine q35 --ostype l26 --scsihw virtio-scsi-single \
   --net0 virtio,bridge=vmbr10 --net1 virtio,bridge=vmbr9 \
   --vga virtio --tablet 1 --onboot 0
@@ -68,7 +68,7 @@ qm importdisk 105 Whonix-Gateway-*.qcow2 $LVM
 qm set 105 --virtio0 $LVM:vm-105-disk-0 --boot order=virtio0
 
 # Workstation: net0 = internal ONLY (vmbr9). virtio-gpu display is important.
-qm create 106 --name Whonix-Workstation --memory 3072 --cores 1 --cpu host \
+qm create 106 --name Whonix-Workstation --memory 3072 --cores 1 --cpu host,hidden=1 \
   --machine q35 --ostype l26 --scsihw virtio-scsi-single \
   --net0 virtio,bridge=vmbr9 --vga virtio --tablet 1 --onboot 0
 qm importdisk 106 Whonix-Workstation-*.qcow2 $LVM
@@ -115,3 +115,4 @@ Workstation console. For a real terminal without breaking anonymity, publish an
 | Mouse won't click in console | no absolute pointer | `--tablet 1` |
 | `sudo` / `passwd` "permission denied" | user/sysmaint split | boot SYSMAINT session |
 | systemcheck "degraded" (emerg-shutdown) | VM has no boot media | harmless, ignore |
+| systemcheck "Unwanted PVClock kvm-clock…" | guest sees the host's paravirt clock | `--cpu host,hidden=1` (hides the hypervisor → removes kvm-clock, also anti-fingerprint). Proxmox can't strip tsc/acpi_pm too, so a residual note is harmless — sdwdate sets the real time over Tor. Silence it if desired: `/etc/systemcheck.d/50_user.conf` → `systemcheck_skip_functions+=" pvclock_unwanted_detected "` |
